@@ -1,8 +1,13 @@
 const express = require("express");
-//const puppeteer = require("puppeteer-core");
-const puppeteer = require("puppeteer"); // Όχι puppeteer-core
+const puppeteer = require("puppeteer");
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+async function ensureChromium() {
+  const browserFetcher = puppeteer.createBrowserFetcher();
+  const revisionInfo = await browserFetcher.download("1181205");
+  return revisionInfo.executablePath;
+}
 
 app.get("/", async (req, res) => {
   const question = req.query.q;
@@ -11,16 +16,17 @@ app.get("/", async (req, res) => {
   }
 
   try {
+    const executablePath = await ensureChromium();
     const browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      headless: "new"
+      executablePath,
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"]
     });
 
     const page = await browser.newPage();
     const searchUrl = "https://www.perplexity.ai/search?q=" + encodeURIComponent(question);
     await page.goto(searchUrl, { waitUntil: "networkidle2" });
 
-    // Περιμένει να φορτωθεί το βασικό περιεχόμενο
     await page.waitForSelector("main");
 
     const answer = await page.evaluate(() => {
