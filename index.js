@@ -11,7 +11,6 @@ app.get("/", async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      executablePath: "/usr/bin/google-chrome",
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
       headless: "new"
     });
@@ -20,7 +19,7 @@ app.get("/", async (req, res) => {
     const searchUrl = "https://www.perplexity.ai/search?q=" + encodeURIComponent(question);
     await page.goto(searchUrl, { waitUntil: "networkidle2" });
 
-    // Περιμένει το κυρίως αποτέλεσμα να εμφανιστεί
+    // Περιμένει να φορτωθεί το βασικό περιεχόμενο
     await page.waitForSelector("main");
 
     const answer = await page.evaluate(() => {
