@@ -1,5 +1,5 @@
 {
-  "name": "perplexity-scraper",
+  "name": "perplexity-slim",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
